@@ -39,3 +39,37 @@ kubectl get pods
 ## Services
 A service connects a container with other containers in the same cluster or the outside world.
 A service of type LoadBalancer connects to the outside, but will need running [`minikube tunnel`](https://minikube.sigs.k8s.io/docs/commands/tunnel/) to allow connecting from the local machine (e.g. `curl routedIP:nodePort` where routedIP is on the right of the route line in minikube tunnel output).
+=> `curl 192.168.64.2:30000`
+
+## Database
+
+### postgres - container
+See yaml, connect with `psql $DATABASE_URL`
+
+To inject the postgresql password in our kube deployments (e.g. worker), we use a kube secret:
+```bash
+kubectl create secret generic postgres-password --from-literal=password="$PG_PASSWORD"
+```
+
+### dbmate - migrations
+See [repo](https://github.com/amacneil/dbmate)
+
+Use:
+- `dbmate new`
+- `dbmate up`
+
+Input: db/migrations
+
+Output: db/schema.sql
+
+### sqlc - SQL -> Go code generation
+See [docs](https://docs.sqlc.dev/en/stable/tutorials/getting-started-postgresql.html)
+
+Use:
+- `sqlc -f db/sqlc.yaml generate`
+
+Config file: db/sqlc.yaml
+
+Input: db/schema.sql, db/queries
+
+Output: db/sqlcgen

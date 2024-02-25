@@ -3,10 +3,6 @@
 # Load environment variables
 source .env
 
-# Start rabbitmq server
-kubectl apply -f deployments/rabbitmq.yaml
-
-# Rebuild, push and deploy the api and worker services
 deploy() {
 	docker build -t $1 -f images/$1/Dockerfile .
 	docker tag $1 $DOCKER_USER/$1:latest
@@ -16,5 +12,18 @@ deploy() {
 	kubectl apply -f deployments/$1.yaml
 }
 
-deploy api
-deploy worker
+# If no argument is passed, deploy all
+if [ -z "$1" ]; then
+	# Start database
+	kubectl apply -f deployments/postgres.yaml
+
+	# Start message broker
+	kubectl apply -f deployments/rabbitmq.yaml
+
+	# Rebuild, push and deploy the api and worker
+	deploy api
+	deploy worker
+	exit 0
+fi
+
+deploy $1
