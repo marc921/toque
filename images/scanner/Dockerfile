@@ -21,6 +21,8 @@ FROM alpine:latest
 # Set the working directory inside the container
 WORKDIR /app
 
+RUN apk add --no-cache nmap
+
 # Copy the built executable from the previous stage
 COPY --from=builder /bin/scanner ./scanner
 
