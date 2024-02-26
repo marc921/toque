@@ -1,4 +1,4 @@
-module marcbrun.io/kubernetes-api/pkg
+module marcbrun.io/toque/pkg
 
 go 1.22
 

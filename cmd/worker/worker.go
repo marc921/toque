@@ -7,8 +7,8 @@ import (
 	"os"
 
 	"github.com/jackc/pgx/v5/pgtype"
-	"marcbrun.io/kubernetes-api/db/sqlcgen"
-	"marcbrun.io/kubernetes-api/pkg"
+	"marcbrun.io/toque/db/sqlcgen"
+	"marcbrun.io/toque/pkg"
 )
 
 func main() {

@@ -8,7 +8,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 
-	"marcbrun.io/kubernetes-api/pkg"
+	"marcbrun.io/toque/pkg"
 )
 
 func main() {

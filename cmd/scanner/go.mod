@@ -1,4 +1,4 @@
-module marcbrun.io/toque/api
+module marcbrun.io/toque/scanner
 
 go 1.22
 

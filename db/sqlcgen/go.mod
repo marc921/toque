@@ -1,4 +1,4 @@
-module marcbrun.io/kubernetes-api/db/sqlcgen
+module marcbrun.io/toque/db/sqlcgen
 
 go 1.22.0
 

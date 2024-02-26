@@ -1,10 +1,10 @@
-module marcbrun.io/kubernetes-api/worker
+module marcbrun.io/toque/worker
 
 go 1.22.0
 
 require (
-	marcbrun.io/kubernetes-api/db/sqlcgen v0.0.0-00010101000000-000000000000
-	marcbrun.io/kubernetes-api/pkg v0.0.0-00010101000000-000000000000
+	marcbrun.io/toque/db/sqlcgen v0.0.0-00010101000000-000000000000
+	marcbrun.io/toque/pkg v0.0.0-00010101000000-000000000000
 )
 
 require (
@@ -17,6 +17,6 @@ require (
 )
 
 replace (
-	marcbrun.io/kubernetes-api/db/sqlcgen => ../../db/sqlcgen
-	marcbrun.io/kubernetes-api/pkg => ../../pkg
+	marcbrun.io/toque/db/sqlcgen => ../../db/sqlcgen
+	marcbrun.io/toque/pkg => ../../pkg
 )
