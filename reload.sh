@@ -23,6 +23,7 @@ if [ -z "$1" ]; then
 	# Rebuild, push and deploy the api and worker
 	deploy api
 	deploy worker
+	deploy scanner
 	exit 0
 fi
 
