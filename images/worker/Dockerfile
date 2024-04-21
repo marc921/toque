@@ -9,7 +9,8 @@ COPY . .
 
 # Download and install any dependencies required by go.mod files in all subdirectories.
 # Run `go mod tidy` in cmd/worker/ to update go.mod if needed.
-RUN find . -type f -name "go.mod" -execdir go mod download \;
+RUN go mod tidy
+RUN go mod download
 
 # Build the Go application
 # Without CGO_ENABLED=0, running the binary will fail with "exec ./worker: no such file or directory"
