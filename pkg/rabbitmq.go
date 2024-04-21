@@ -12,6 +12,16 @@ type Publisher interface {
 	Close() error
 }
 
+type PublisherMock struct{}
+
+func (p *PublisherMock) Publish(ctx context.Context, body string) error {
+	return nil
+}
+
+func (p *PublisherMock) Close() error {
+	return nil
+}
+
 type Consumer interface {
 	Consume() (<-chan amqp.Delivery, error)
 	Close() error

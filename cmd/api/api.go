@@ -3,17 +3,18 @@ package main
 import (
 	"context"
 	"fmt"
-	"net/http"
 	"time"
 
 	"github.com/labstack/echo/v4"
 
 	"marcbrun.io/toque/pkg"
+	"marcbrun.io/toque/pkg/api"
 )
 
 func main() {
 	// Create a new Echo instance
 	e := echo.New()
+	e.Validator = api.NewCustomValidator()
 
 	// Create RabbitMQ publisher
 	publisher, err := pkg.NewRabbitMQClient()
@@ -22,14 +23,11 @@ func main() {
 	}
 	defer publisher.Close()
 
+	// Create a new handler
+	handler := api.NewHandler(publisher)
+
 	// Define a route handler
-	e.GET("/", func(c echo.Context) error {
-		err = publisher.Publish(c.Request().Context(), "Hello, World!")
-		if err != nil {
-			return fmt.Errorf("failed to publish a message: %v", err)
-		}
-		return c.String(http.StatusOK, "Hello, World!")
-	})
+	e.POST("/", handler.Echo)
 
 	go func() {
 		pkg.OnSignal(func() {
