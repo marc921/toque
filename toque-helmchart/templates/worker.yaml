@@ -11,12 +11,14 @@ spec:
       app: worker
   template:
     metadata:
+      annotations:
+        releaseTime: {{ dateInZone "2006-01-02 15:04:05Z" (now) "UTC"| quote }}
       labels:
         app: worker
     spec:
       containers:
       - name: worker
-        image: marcbrunlearning/worker:latest
+        image: {{ .Values.scaleway.containerRegistry }}/worker:latest
         env:
           - name: POSTGRES_PASSWORD
             valueFrom:
@@ -24,6 +26,6 @@ spec:
                 name: postgres-password
                 key: password
           - name: DATABASE_URL
-            value: "postgresql://postgres:$(POSTGRES_PASSWORD)@postgres-service:5432/db?sslmode=disable"
+            value: "postgresql://postgres:{{ .Values.postgres.password }}@postgres-service:{{ .Values.postgres.port }}/db?sslmode=disable"
       imagePullSecrets:
-        - name: docker-cred
+        - name: container-registry-secret

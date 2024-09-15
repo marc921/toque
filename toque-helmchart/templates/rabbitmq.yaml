@@ -16,9 +16,9 @@ spec:
     spec:
       containers:
       - name: rabbitmq
-        image: rabbitmq:latest
+        image: rabbitmq:3.13-management
         ports:
-        - containerPort: 5672
+        - containerPort: {{ .Values.rabbitmq.port }}
           
 ---
 
@@ -31,5 +31,5 @@ spec:
     app: rabbitmq
   ports:
     - protocol: TCP
-      port: 5672
-      targetPort: 5672
+      port: {{ .Values.rabbitmq.port }}
+      targetPort: {{ .Values.rabbitmq.port }}

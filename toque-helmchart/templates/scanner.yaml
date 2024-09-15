@@ -5,7 +5,7 @@ metadata:
   labels:
     app: scanner
 spec:
-  replicas: 1
+  replicas: 0
   selector:
     matchLabels:
       app: scanner
@@ -16,6 +16,6 @@ spec:
     spec:
       containers:
       - name: scanner
-        image: marcbrunlearning/scanner:latest
+        image: {{ .Values.scaleway.containerRegistry }}/scanner:latest
       imagePullSecrets:
-        - name: docker-cred
+        - name: container-registry-secret

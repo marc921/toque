@@ -55,7 +55,7 @@ kubectl create secret generic postgres-password --from-literal=password="$PG_PAS
 See [repo](https://github.com/amacneil/dbmate)
 
 Use:
-- `dbmate new`
+- `dbmate new <name>`
 - `dbmate up`
 
 Input: db/migrations

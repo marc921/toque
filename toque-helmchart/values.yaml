@@ -1,0 +1,10 @@
+api:
+  port: 8080
+postgres:
+  port: 5432
+  password: ${POSTGRES_PASSWORD}
+rabbitmq:
+  port: 5672
+scaleway:
+  secretKey: ${SCW_SECRET_KEY}
+  containerRegistry: rg.fr-par.scw.cloud/toque-container-registry

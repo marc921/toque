@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 
 	"marcbrun.io/toque/pkg"
 	"marcbrun.io/toque/pkg/api"
@@ -14,6 +15,7 @@ import (
 func main() {
 	// Create a new Echo instance
 	e := echo.New()
+	e.Use(middleware.Logger())
 	e.Validator = api.NewCustomValidator()
 
 	// Create RabbitMQ publisher
@@ -28,6 +30,7 @@ func main() {
 
 	// Define a route handler
 	e.POST("/", handler.Echo)
+	e.POST("/test", handler.StressTest)
 
 	go func() {
 		pkg.OnSignal(func() {

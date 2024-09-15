@@ -19,27 +19,30 @@ spec:
         image: postgres:latest
         env:
           - name: POSTGRES_PASSWORD
-            value: "postgres_pass"  # TODO: get this from a secret (vault?) / environment variable
+            valueFrom:
+              secretKeyRef:
+                name: postgres-password
+                key: password
         ports:
-          - containerPort: 5432
+          - containerPort: {{ .Values.postgres.port }}
         volumeMounts:
           - name: postgres-storage
-            mountPath: /var/lib/postgresql/data
+            mountPath: /var/lib/postgresql/
       volumes:
         - name: postgres-storage
           persistentVolumeClaim:
-            claimName: postgres-pvc
+            claimName: toque-postgres-pvc
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: postgres-pvc
+  name: toque-postgres-pvc
 spec:
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
-      storage: 200Mi
+      storage: 1000Mi
 ---
 apiVersion: v1
 kind: Service
@@ -50,8 +53,15 @@ spec:
     app: postgres
   ports:
     - protocol: TCP
-      port: 5432
-      targetPort: 5432
+      port: {{ .Values.postgres.port }}
+      targetPort: {{ .Values.postgres.port }}
       nodePort: 30001   # Port exposed externally by the node
   type: NodePort
-
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: postgres-password
+type: Opaque
+data:
+  password: {{ .Values.postgres.password | b64enc | quote }}
