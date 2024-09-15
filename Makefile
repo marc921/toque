@@ -35,6 +35,12 @@ docker-up:
 helm-apply:
 	helm --kubeconfig $(KUBECONFIG) upgrade --install $(RELEASE) ./toque-helmchart
 
+.PHONY: terraform-apply
+terraform-apply:
+	terraform -chdir=terraform init
+	terraform -chdir=terraform apply
+
+
 .PHONY: all
 all:
 	# make k8s-up

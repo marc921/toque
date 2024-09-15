@@ -1,0 +1,8 @@
+kubeconfig.yaml
+**/.terraform/*
+*.tfstate
+*.tfstate.*
+*.log
+*.log.*
+.terraform.lock.hcl
+.terraform.lock.hcl.*
