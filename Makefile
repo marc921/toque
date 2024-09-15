@@ -8,14 +8,9 @@ build:
 	@docker login $(CONTAINER_REGISTRY) -u nologin --password-stdin <<< "$(SCW_SECRET_KEY)"
 	docker push $(CONTAINER_REGISTRY)/$(COMPONENT):latest
 
-.PHONY: k8s-up
-k8s-up:
+.PHONY: minikube-up
+minikube-up:
 	minikube status 2>/dev/null | grep -q Running || minikube start
-
-.PHONY: down
-down:
-	kubectl delete all --all
-	# minikube stop
 
 .PHONY: docker-up
 docker-up:
@@ -40,13 +35,31 @@ terraform-apply:
 	terraform -chdir=terraform init
 	terraform -chdir=terraform apply
 
+.PHONY: terraform-destroy
+terraform-destroy:
+	terraform -chdir=terraform destroy
 
-.PHONY: all
-all:
-	# make k8s-up
-	go mod tidy
+
+.PHONY: cluster-up
+cluster-up:
 	make docker-up
+	go mod tidy
 	make build COMPONENT=api
 	make build COMPONENT=worker
 	make build COMPONENT=scanner
 	make helm-apply RELEASE=toque-release
+
+.PHONY: cluster-down
+cluster-down:
+	kubectl delete all --all
+	# minikube stop
+
+.PHONY: up
+up:
+	make terraform-apply
+	make cluster-up
+
+.PHONY: down
+down:
+	make cluster-down
+	make terraform-destroy
