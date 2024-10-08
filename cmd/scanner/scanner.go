@@ -3,17 +3,29 @@ package main
 import (
 	"context"
 	"encoding/json"
-	"fmt"
-	"log"
 
+	"go.uber.org/zap"
 	"marcbrun.io/toque/pkg"
+	"marcbrun.io/toque/pkg/messagebroker"
 
 	"github.com/Ullaakut/nmap/v3"
 )
 
 func main() {
 	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
 	go pkg.OnSignal(cancel)
+
+	config, err := ParseConfig(ctx)
+	if err != nil {
+		zap.L().Fatal("ParseConfig", zap.Error(err))
+	}
+
+	logger := pkg.NewLogger(config.Env, "scanner")
+
+	logger.Info("Starting...")
+	defer logger.Info("Shutting down.")
 
 	// Equivalent to `/usr/local/bin/nmap -p 80,443,843 google.com facebook.com youtube.com`,
 	scanner, err := nmap.NewScanner(
@@ -22,21 +34,26 @@ func main() {
 		nmap.WithPorts("80,443,843"),
 	)
 	if err != nil {
-		log.Fatalf("unable to create nmap scanner: %v", err)
+		logger.Fatal("unable to create nmap scanner", zap.Error(err))
 	}
 
 	result, warnings, err := scanner.Run()
 	if len(*warnings) > 0 {
-		log.Printf("run finished with warnings: %s\n", *warnings) // Warnings are non-critical errors from nmap.
+		logger.Warn("run finished with warnings", zap.Strings("warnings", *warnings)) // Warnings are non-critical errors from nmap.
 	}
 	if err != nil {
-		log.Fatalf("unable to run nmap scan: %v", err)
+		logger.Fatal("unable to run nmap scan", zap.Error(err))
 	}
 
 	// // Create RabbitMQ publisher
-	publisher, err := pkg.NewRabbitMQClient()
+	publisher, err := messagebroker.NewRabbitMQClient(
+		ctx,
+		logger.With(zap.String("component", "RabbitMQPublisher")),
+		config.RabbitMQ.URL,
+		"worker-input",
+	)
 	if err != nil {
-		log.Fatal(fmt.Errorf("failed to create RabbitMQ publisher: %w", err))
+		logger.Fatal("failed to create RabbitMQ publisher", zap.Error(err))
 	}
 	defer publisher.Close()
 
@@ -65,17 +82,20 @@ func main() {
 		}
 		body, err := json.Marshal(nmapHost)
 		if err != nil {
-			log.Printf("failed to marshal nmapHost: %v", err)
+			logger.Error("failed to marshal nmapHost", zap.Error(err))
 			continue
 		}
-		err = publisher.Publish(ctx, string(body))
+		err = publisher.Publish(ctx, body)
 		if err != nil {
-			log.Printf("failed to publish a message: %v", err)
+			logger.Error("failed to publish a message", zap.Error(err))
 		}
 	}
 
-	log.Printf("Nmap done: %d hosts up scanned in %.2f seconds\n", len(result.Hosts), result.Stats.Finished.Elapsed)
-
+	logger.Info(
+		"Nmap done",
+		zap.Int("hosts_up", len(result.Hosts)),
+		zap.Float32("elapsed_seconds", result.Stats.Finished.Elapsed),
+	)
 }
 
 type NmapHost struct {

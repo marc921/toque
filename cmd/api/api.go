@@ -2,17 +2,22 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	"go.uber.org/zap"
 
 	"marcbrun.io/toque/pkg"
 	"marcbrun.io/toque/pkg/api"
 )
 
 func main() {
+	logger := pkg.NewLogger("production", "api")
+
+	logger.Info("Starting...")
+	defer logger.Info("Shutting down.")
+
 	// Create a new Echo instance
 	e := echo.New()
 	e.Use(middleware.Logger())
@@ -21,7 +26,7 @@ func main() {
 	// Create RabbitMQ publisher
 	publisher, err := pkg.NewRabbitMQClient()
 	if err != nil {
-		e.Logger.Fatal(fmt.Errorf("failed to create RabbitMQ publisher: %v", err))
+		logger.Fatal("failed to create RabbitMQ publisher", zap.Error(err))
 	}
 	defer publisher.Close()
 
@@ -34,7 +39,7 @@ func main() {
 
 	go func() {
 		pkg.OnSignal(func() {
-			e.Logger.Info("Shutting down the server")
+			logger.Info("Shutting down the server...")
 			shutdownCtx, shutdownCancel := context.WithTimeout(context.Background(), 5*time.Second)
 			defer shutdownCancel()
 			e.Shutdown(shutdownCtx)
@@ -42,5 +47,8 @@ func main() {
 	}()
 
 	// Start the server
-	e.Logger.Fatal(e.Start(":8080"))
+	err = e.Start(":8080")
+	if err != nil {
+		logger.Fatal("e.Start", zap.Error(err))
+	}
 }

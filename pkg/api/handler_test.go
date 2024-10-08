@@ -9,7 +9,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/require"
-	"marcbrun.io/toque/pkg"
+	"marcbrun.io/toque/pkg/messagebroker"
 )
 
 func TestHelloHandler(t *testing.T) {
@@ -24,7 +24,7 @@ func TestHelloHandler(t *testing.T) {
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
-	handler := NewHandler(&pkg.PublisherMock{})
+	handler := NewHandler(&messagebroker.PublisherMock{})
 
 	require.NoError(t, handler.Echo(c))
 	require.Equal(t, http.StatusOK, rec.Code)

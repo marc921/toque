@@ -73,3 +73,9 @@ Config file: db/sqlc.yaml
 Input: db/schema.sql, db/queries
 
 Output: db/sqlcgen
+
+# TODO
+- container registry terraform
+- containers dependency on rabbitmq, postgres
+- save kubeconfig somewhere else?
+- save terraform state on bucket

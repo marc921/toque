@@ -8,14 +8,14 @@ import (
 	"golang.org/x/sync/errgroup"
 
 	"github.com/labstack/echo/v4"
-	"marcbrun.io/toque/pkg"
+	"marcbrun.io/toque/pkg/messagebroker"
 )
 
 type Handler struct {
-	publisher pkg.Publisher
+	publisher messagebroker.Publisher
 }
 
-func NewHandler(publisher pkg.Publisher) *Handler {
+func NewHandler(publisher messagebroker.Publisher) *Handler {
 	return &Handler{publisher: publisher}
 }
 

@@ -17,5 +17,8 @@ spec:
       containers:
       - name: scanner
         image: {{ .Values.scaleway.containerRegistry }}/scanner:latest
+        env:
+          - name: RABBITMQ_URL
+            value: "amqp://guest:guest@rabbitmq-service:5672/"
       imagePullSecrets:
         - name: container-registry-secret
